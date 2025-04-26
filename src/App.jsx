@@ -15,18 +15,6 @@ function App() {
     return { good: 0, neutral: 0, bad: 0 };
   });
 
-  const [isVisible, setIsVisible] = useState(false);
-
-  let totalFeedback = feedback.good + feedback.neutral + feedback.bad;
-
-  let positive = Math.round((feedback.good / totalFeedback) * 100);
-
-  useEffect(() => {
-    const { good, neutral, bad } = feedback;
-    const totalFeedback = good + neutral + bad;
-    setIsVisible(totalFeedback > 0);
-  }, [feedback]);
-
   useEffect(() => {
     localStorage.setItem("savedFeedback", JSON.stringify(feedback));
   }, [feedback]);
@@ -46,17 +34,20 @@ function App() {
     });
   };
 
+  const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
+  const positive =
+    totalFeedback === 0 ? 0 : Math.round((feedback.good / totalFeedback) * 100);
+
   return (
     <div>
       <Description />
-      <Options update={updateFeedback} isOpen={isVisible} reset={handleReset} />
-      {isVisible ? (
-        <Feedback
-          feedback={feedback}
-          isVisibleFeedback={isVisible}
-          setFeedback={setFeedback}
-          positive={positive}
-        />
+      <Options
+        updateFeedback={updateFeedback}
+        handleReset={handleReset}
+        totalFeedback={totalFeedback}
+      />
+      {totalFeedback > 0 ? (
+        <Feedback feedback={feedback} positive={positive} />
       ) : (
         <Notification />
       )}
